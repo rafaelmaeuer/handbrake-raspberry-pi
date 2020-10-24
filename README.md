@@ -8,6 +8,16 @@ Does it make sense to build Handbrake on Raspberry Pi? Be warned it wont be fast
 
 I have managed successfully compile it on RPi 2B+, 3 and 3B+ running raspbian 4.14.98 (kapitainsky) and on RPi 4 running raspbian 5.4.51 (rafaelmaeuer).
 
+**This repository includes scripts to:**
+
+- monitor temperature while encoding
+- limit CPU usage for encoding
+- automatic shutdown after encoding
+- send notification (ifttt) before shutdown
+- delay countdown for user interruption
+- eject/spindown of HDD when shutdown
+- scan h264 level of MKV (recursively)
+
 ### 1. Install all dependencies
 
 For CLI:

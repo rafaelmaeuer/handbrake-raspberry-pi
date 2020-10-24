@@ -1,0 +1,13 @@
+[Unit]
+Description=[=======USB-HDD-spindown=======]
+DefaultDependencies=no
+After=umount.target
+Before=shutdown.target halt.target
+
+[Service]
+ExecStart=/bin/bash  /home/pi/handbrake-pi/scripts/ejectHDD.sh
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=shutdown.target

@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Link
+Name=HandBrake
+Icon=fr.handbrake.ghb
+URL=/home/pi/handbrake-pi/scripts/watchHB.sh
