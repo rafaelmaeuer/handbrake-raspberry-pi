@@ -1,13 +1,12 @@
 [Unit]
-Description=[=======USB-HDD-spindown=======]
+Description=[=======USB-HDD-Spindown=======]
 DefaultDependencies=no
-After=umount.target
-Before=shutdown.target halt.target
+Before=umount.target
 
 [Service]
-ExecStart=/bin/bash  /home/pi/handbrake-pi/scripts/ejectHDD.sh
 Type=oneshot
-RemainAfterExit=yes
+RemainAfterExit=true
+ExecStart=/bin/bash /home/pi/scripts/HDD/stopHDD.sh
 
 [Install]
-WantedBy=shutdown.target
+WantedBy=halt.target poweroff.target

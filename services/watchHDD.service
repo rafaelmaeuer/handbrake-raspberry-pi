@@ -1,0 +1,10 @@
+[Unit]
+Description=[=======USB-HDD-Mounter=======]
+Requires={media-pi-Name\x20of\x204Drive.mount}
+After={media-pi-Name\x20of\x204Drive.mount}
+
+[Service]
+ExecStart=/bin/bash /home/pi/scripts/HDD/startHDD.sh
+
+[Install]
+WantedBy={media-pi-Name\x20of\x204Drive.mount}

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-drive="Name of HDD"
+drive="{Name of Drive}"
 mount=`df -h | grep "$drive" | head -c 9`
 parm=`echo "$mount" | head -c 8`
 
