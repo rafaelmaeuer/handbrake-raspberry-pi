@@ -17,13 +17,13 @@ As the mounting point of the HDD which should be spindown can change we need to 
 3. Start HDD watcher service
 
     ```sh
-    sudo systemctl enable watchHDD.service --now
+    sudo systemctl enable /home/pi/handbrake-pi/services/watchHDD.service --now
     sudo systemctl daemon-reload
     ```
 
 ## Add service to spindown on shutdown
 
-1. Replace HDD name in "{Name of Drive}" in
+1. Replace HDD name for each "{Name of Drive}" in
 
    - `scripts/HDD/ejectHDD.sh`
    - `scripts/HDD/startHDD.sh`
@@ -31,7 +31,7 @@ As the mounting point of the HDD which should be spindown can change we need to 
 2. Start HDD spindown service
 
     ```sh
-    sudo ln -s /home/pi/handbrake-pi/service/ejectHDD.service /etc/systemd/system/
+    sudo systemctl enable /home/pi/handbrake-pi/services/ejectHDD.service --now
     sudo systemctl daemon-reload
     ```
 

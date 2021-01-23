@@ -2,13 +2,13 @@
 
 file=/home/pi/HDD.mount
 mount=`cat "$file"`
-parm=`echo "$mount" | head -c 8`
-file=/home/pi/HDD.log
+disk=`echo "$mount" | head -c 8`
+log=/home/pi/HDD.log
 
-echo "unmount $mount" &> "$file"
-sudo umount -f "$mount" &>> "$file"
+echo $(date +"%T") "unmount $mount" &> "$log"
+sudo umount -f "$mount" &>> "$log"
 sleep 1
 
-echo "spindown $parm" &>> "$file"
-sudo hdparm -y "$parm" &>> "$file"
+echo $(date +"%T") "spindown $disk" &>> "$log"
+sudo hdparm -y "$disk" &>> "$log"
 sleep 1
