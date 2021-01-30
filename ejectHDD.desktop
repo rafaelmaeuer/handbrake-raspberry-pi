@@ -2,4 +2,4 @@
 Type=Link
 Name=EjectHDD
 Icon=drive-removable-media.png
-URL=/home/pi/Scripts/HDD/ejectHDD.sh
+URL=/home/pi/scripts/ejectHDD.sh

@@ -1,5 +1,4 @@
 #!/bin/bash
-
 timeout=120
 
 for (( i=0 ; i <= $timeout ; i++ )) do 
@@ -10,8 +9,8 @@ done | zenity  --progress --title="Automatisch Ausschalten..."  \
     --window-icon=warning --width=400 --auto-close
 
 if [ $? = 0 ] ; then
-    echo $(date +"%T") "shutdown now"
-    sudo shutdown now
+    echo $(date +"%T") "eject HDD and shutdown"
+    sudo ./ejectHDD.sh shutdown
 else 
     echo $(date +"%T") "shutdown cancelled"
 fi
