@@ -31,7 +31,7 @@
 
 ## Automatic Shutdown
 
-1. Set shutdown timout in `scripts/shutdown.sh`
+1. Set shutdown timeout in `scripts/shutdown.sh`
 
    ```sh
    # Set timeout after which system is shutdown
@@ -40,8 +40,6 @@
 
 ## Sources
 
-[How to show and update echo on same line](https://stackoverflow.com/questions/12628327/how-to-show-and-update-echo-on-same-line/12628482#12628482)
-
-[Shell Script to read and warning CPU temp](https://www.raspberrypi.org/forums/viewtopic.php?t=191029#p1199727)
-
-[If command reach timeout execute other command](https://unix.stackexchange.com/questions/317007/if-command-reach-timeout-execute-other-command/317016#317016)
+- [How to show and update echo on same line](https://stackoverflow.com/questions/12628327/how-to-show-and-update-echo-on-same-line/12628482#12628482)
+- [Shell Script to read and warning CPU temp](https://www.raspberrypi.org/forums/viewtopic.php?t=191029#p1199727)
+- [If command reach timeout execute other command](https://unix.stackexchange.com/questions/317007/if-command-reach-timeout-execute-other-command/317016#317016)

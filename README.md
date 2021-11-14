@@ -2,13 +2,13 @@
 
 Building Handbrake CLI and GUI on Raspberry Pi 4 including x265 codec
 
-![HandBrake on RPi4](img/HandBrake-on-RPi4.png)
+![HandBrake on RPi4](images/HandBrake-on-RPi4.png)
 
 Does it make sense to build Handbrake on Raspberry Pi? Be warned it wont be fast. 10-20 times slower that i5 Intel CPU laptop. But it works so why not.
 
-I have managed successfully compile it on RPi 2B+, 3 and 3B+ running raspbian 4.14.98 (kapitainsky) and on RPi 4 running raspbian 5.4.51 (rafaelmaeuer).
+I have managed successfully compile it on RPi 2B+, 3 and 3B+ running raspbian 4.14.98 (`kapitainsky`) and on RPi 4 running raspbian 5.4.51 (`rafaelmaeuer`).
 
-**This repository includes scripts to:**
+**This repository includes [scripts](./scripts) and [desktop-shortcuts](./desktop) to:**
 
 - monitor temperature while encoding
 - limit CPU usage for encoding
