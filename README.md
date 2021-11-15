@@ -1,12 +1,12 @@
-# Handbrake on Raspberry Pi
+# HandBrake on Raspberry Pi
 
-Building Handbrake CLI and GUI on Raspberry Pi 4 including x265 codec
+Building HandBrake CLI and GUI on Raspberry Pi 4 including x265 codec
 
 ![HandBrake on RPi4](images/HandBrake-on-RPi4.png)
 
-Does it make sense to build Handbrake on Raspberry Pi? Be warned it wont be fast. 10-20 times slower that i5 Intel CPU laptop. But it works so why not.
+Does it make sense to build HandBrake on Raspberry Pi? Be warned it wont be fast. Many times slower than Intel CPU laptop. But it works so why not.
 
-I have managed successfully compile it on RPi 2B+, 3 and 3B+ running raspbian 4.14.98 (`kapitainsky`) and on RPi 4 running raspbian 5.4.51 (`rafaelmaeuer`).
+I have managed successfully to compile it on RPi 2B+, 3, 3B+ and 4 running Raspbian based on Debian 9 and 10.
 
 **This repository includes [scripts](./scripts) and [desktop-shortcuts](./desktop) to:**
 
@@ -20,37 +20,64 @@ I have managed successfully compile it on RPi 2B+, 3 and 3B+ running raspbian 4.
 
 ### 1. Install all dependencies
 
-For CLI:
-
 ```sh
-sudo apt-get install git autoconf automake build-essential cmake libass-dev libbz2-dev libfontconfig1-dev libfreetype6-dev libfribidi-dev libharfbuzz-dev libjansson-dev liblzma-dev libmp3lame-dev libogg-dev libopus-dev libsamplerate-dev libspeex-dev libtheora-dev libtool libtool-bin libvorbis-dev libx264-dev libxml2-dev m4 make patch pkg-config python tar yasm zlib1g-dev libvpx-dev xz-utils bzip2 zlib1g meson libnuma-dev
+sudo apt-get install autoconf automake build-essential cmake git libass-dev libbz2-dev libfontconfig1-dev libfreetype6-dev libfribidi-dev libharfbuzz-dev libjansson-dev liblzma-dev libmp3lame-dev libnuma-dev libogg-dev libopus-dev libsamplerate-dev libspeex-dev libtheora-dev libtool libtool-bin libvorbis-dev libx264-dev libxml2-dev libvpx-dev m4 make ninja-build patch pkg-config python tar zlib1g-dev patch libvpx-dev xz-utils bzip2 zlib1g libturbojpeg0-dev appstream
 ```
 
-For GUI:
+For GUI version add:
 
 ```sh
-sudo apt-get install intltool libappindicator-dev libdbus-glib-1-dev libglib2.0-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgtk-3-dev libgudev-1.0-dev libnotify-dev libwebkitgtk-3.0-dev
+sudo apt-get install intltool libappindicator-dev libdbus-glib-1-dev libglib2.0-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgtk-3-dev libgudev-1.0-dev libnotify-dev
 ```
 
-### 2. Debian nasm is too old, so get a newer one
+On Debian 9 add:
 
 ```sh
-sudo curl -L 'http://ftp.debian.org/debian/pool/main/n/nasm/nasm_2.14-1_armhf.deb' -o /var/cache/apt/archives/nasm_2.14-1_armhf.deb && sudo dpkg -i /var/cache/apt/archives/nasm_2.14-1_armhf.deb
+sudo apt-get install libwebkitgtk-3.0-dev
+```
+
+On Debian 10 add:
+
+```sh
+sudo apt-get install libwebkit2gtk-4.0-dev
+```
+
+### 2. Install nasm and meson
+
+On Debian 9 nasm and meson are too old so we need newer ones:
+
+  - Install nasm
+
+    ```sh
+    sudo curl -L 'http://ftp.debian.org/debian/pool/main/n/nasm/nasm_2.14-1_armhf.deb' -o /var/cache/apt/archives/nasm_2.14-1_armhf.deb && \
+    sudo dpkg -i /var/cache/apt/archives/nasm_2.14-1_armhf.deb
+    ```
+
+  - Install meson
+
+    ```sh
+    sudo add-apt-repository -s 'deb http://deb.debian.org/debian stretch-backports main' && \
+    sudo apt-get update && \
+    sudo apt-get -t stretch-backports install meson
+    ```
+
+On Debian 10 things are easier:
+
+```sh
+sudo apt-get install meson nasm
 ```
 
 ### 3. Get the HandBrake source code
 
-```sh
-# Download
-wget https://github.com/HandBrake/HandBrake/releases/download/1.3.3/HandBrake-1.3.3-source.tar.bz2
+Get version 1.4.2 of HandBrake from github repo
 
-# Unpack
-tar -xf HandBrake-1.3.3-source.tar.bz2
+```sh
+git clone -b 1.4.2 https://github.com/HandBrake/HandBrake.git && cd HandBrake
 ```
 
 ### 4. Add extra configure parameters to X265 module
 
-Without it won't compile on RPi
+Without it compilation will fail on RPi
 
 ```sh
 echo "X265_8.CONFIGURE.extra +=  -DENABLE_ASSEMBLY=OFF -DENABLE_PIC=ON -DENABLE_AGGRESSIVE_CHECKS=ON -DENABLE_TESTS=ON -DCMAKE_SKIP_RPATH=ON" >> ./contrib/x265_8bit/module.defs \
@@ -78,7 +105,7 @@ For CLI and GUI:
 
 ### 6. Make quick-and-dirty hack to x265 source code
 
-Code compiles with `DENABLE_ASSEMBLY=OFF` but x265 code does not take it into account that they don't handle it right for ARMv7 (I have reported it to X265 guys so maybe in the future it wont be required if they modify their code)
+Code compiles with `DENABLE_ASSEMBLY=OFF` but x265 code does not take into account that it is not handled correctly for ARMv7 (I have reported it to X265 guys so maybe in the future it wont be required if they modify their code)
 
 But first start building so things get downloaded
 
@@ -87,16 +114,20 @@ cd build
 ```
 
 ```sh
-make -j 4 x265
+make x265
 ```
 
-Wait until you see that files have been downloaded then CTRL-C
+Wait until you see that files have been downloaded and patched. It is the first thing happening. Then stop the rest by pressing CTRL-C.
+
+Now we can make it raspberry pi compatible:
 
 ```sh
-nano ./contrib/x265/x265_3.2.1/source/common/primitives.cpp
+nano ./contrib/x265/x265_3.5/source/common/primitives.cpp
 ```
 
-and change following section - at the end of the file:
+*Note: `x265_3.5` folder can be different as x265 software is an active project and its version can change. Modify it accordingly.*
+
+Change the following pre-compiler directive - at the end of the file:
 
 ```cpp
 #if X265_ARCH_ARM == 0
@@ -114,23 +145,25 @@ int PFX(cpu_fast_neon_mrc_test)(void) { return 0; }
 #endif // X265_ARCH_ARM
 ```
 
-just change `==` condition to `!=`
+Just change `==` condition in the first line to `!=`
 
-### 7. Build all now
+### 7. Let's build
+
+If you see some errors after `make clean` you can safely ignore them. This step is only needed to clean x265 interrupted build.
 
 ```sh
 make clean
 ```
 
+Now start the full HandBrake build.
+
 ```sh
 make -j $(nproc)
 ```
 
-Take a break - it finishes in about 30 min on RPi 3B+, twice as long on RPi 2B+
+Take a break - it takes some time. Approximately 25 min on RPi 4. And much longer on older RPi models.
 
-### 8. Check for binaries
-
-When finished following executable binaries should exist
+### 8. When finished executable binaries should be ready
 
 - CLI: `build/HandBrakeCLI`
 - GUI: `build/gtk/src/ghb`
@@ -141,7 +174,7 @@ When finished following executable binaries should exist
 sudo make --directory=. install
 ```
 
-### 10. Basic usage
+### 10. Basic CLI usage
 
 ```sh
 HandBrakeCLI -i PATH-OF-SOURCE-FILE -o NAME-OF-OUTPUT-FILE --"preset-name"
@@ -161,16 +194,10 @@ Example:
 
 ### Sources
 
-[https://github.com/kapitainsky/handbreak-RaspberryPi/issues/2](https://github.com/kapitainsky/handbreak-RaspberryPi/issues/2)
-
-[https://handbrake.fr/docs/en/1.2.0/developer/install-dependencies-debian.html](https://handbrake.fr/docs/en/1.2.0/developer/install-dependencies-debian.html)
-
-[https://handbrake.fr/docs/en/1.2.0/developer/build-linux.html](https://handbrake.fr/docs/en/1.2.0/developer/build-linux.html)
-
-[https://mattgadient.com/2016/06/20/handbrake-0-10-5-nightly-and-arm-armv7-short-benchmark-and-how-to/](https://mattgadient.com/2016/06/20/handbrake-0-10-5-nightly-and-arm-armv7-short-benchmark-and-how-to/)
-
-[https://retropie.org.uk/forum/topic/13092/scrape-videos-and-reencode-them-directly-on-the-raspberry-pi-with-sselph-s-scraper](https://retropie.org.uk/forum/topic/13092/scrape-videos-and-reencode-them-directly-on-the-raspberry-pi-with-sselph-s-scraper)
-
-[https://www.linux.com/learn/how-convert-videos-linux-using-command-line](https://www.linux.com/learn/how-convert-videos-linux-using-command-line)
-
-[https://handbrake.fr/docs/en/1.2.0/cli/cli-options.html](https://handbrake.fr/docs/en/1.2.0/cli/cli-options.html)
+- [Handbrake v1.3.2 on RaspberryPi 4 with Raspian Buster](https://github.com/kapitainsky/handbreak-RaspberryPi/issues/2)
+- [HandBrake Documentation (1.3.0) - Installing dependencies on Debian](https://handbrake.fr/docs/en/1.3.0/developer/install-dependencies-debian.html)
+- [HandBrake Documentation (1.3.0) - Building HandBrake for Linux](https://handbrake.fr/docs/en/1.3.0/developer/build-linux.html)
+- [HandBrake 0.10.5 nightly and ARM (ARMv7) – short benchmark and how-to](https://mattgadient.com/2016/06/20/handbrake-0-10-5-nightly-and-arm-armv7-short-benchmark-and-how-to/)
+- [Scrape videos and reencode them directly on the Raspberry Pi with sselph's scraper](https://retropie.org.uk/forum/topic/13092/scrape-videos-and-reencode-them-directly-on-the-raspberry-pi-with-sselph-s-scraper)
+- [How to Convert Videos in Linux Using the Command Line](https://www.linux.com/learn/how-convert-videos-linux-using-command-line)
+[HandBrake Documentation - CLI Options](https://handbrake.fr/docs/en/1.3.0/cli/cli-options.html)
